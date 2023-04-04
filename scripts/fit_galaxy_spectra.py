@@ -13,6 +13,9 @@ from prospect.sources import CSPSpecBasis
 from prospect.fitting import lnprobfn, fit_model
 from prospect.io import write_results as writer
 
+import os
+os.environ['SPS_HOME'] = "/home/mkarmen1/offcenter_blackholes/misc/fsps"
+
 # read the data
 file = '../data/spec-at2018bsi-host-sdss.fits'
 t_spec = Table.read(file, hdu=1)
