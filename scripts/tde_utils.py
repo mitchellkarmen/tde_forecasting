@@ -51,7 +51,6 @@ class GalaxySource(sncosmo.Source):
         spectrum = sncosmo.Spectrum(default_wave, rf_flux, fill_errs)
         binned_spectrum = spectrum.rebin(wave)
         flux = binned_spectrum.flux
-        flux = 0
         return flux.reshape(1, len(flux))
 
 class BlackBodySource(sncosmo.Source):
