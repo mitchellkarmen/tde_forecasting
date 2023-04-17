@@ -95,11 +95,11 @@ for filt in filter_loop:
             #snia_mags[filt].append(np.nan)
             print('simulating sn as blackbody')
             snia_scale = 1.718e-16
-            snia_source = tde_utils.BlackBodySource(temperature=5500., scale=snia_scale)
-            snia_model = sncosmo.Model(source=snia_source)
-            snia_model.set(z=z)
+            bb_snia_source = tde_utils.BlackBodySource(temperature=5500., scale=snia_scale)
+            bb_snia_model = sncosmo.Model(source=bb_snia_source)
+            bb_snia_model.set(z=z)
             
-            snia_zstretched_mag = snia_model.bandmag(filt, 'ab', 0)
+            snia_zstretched_mag = bb_snia_model.bandmag(filt, 'ab', 0)
             snia_app_mag = snia_zstretched_mag + 5*np.log10(luminosity_distance/(10 * u.parsec))
             snia_mags[filt][i] = snia_app_mag
             
