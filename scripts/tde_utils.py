@@ -35,10 +35,7 @@ class GalaxySource(sncosmo.Source):
         coeffs = kc.fit_coeffs(redshift=obs_z, maggies=maggies, ivar = ivar)
         rf_mags = kc.absmag(redshift=obs_z, maggies=maggies, ivar=ivar, coeffs=coeffs)
         maggies, ivar = kcorrect.utils.sdss_asinh_to_maggies(rf_mags, errs)
-        coeffs = kc.fit_coeffs(redshift=0, maggies=maggies, ivar = ivar)
-
-        default_flux = coeffs.dot(templates.flux)
-        
+        coeffs = kc.fit_coeffs(redshift=0, maggies=maggies, ivar = ivar)        
         
         templates = kc.templates
         default_flux = coeffs.dot(templates.flux)
