@@ -52,7 +52,12 @@ for passband in jwst_nircam_limits.keys():
     snia_mags[passband] = np.zeros(len(zs))
     qso_mags[passband] = np.zeros(len(zs))
 
+source = tde_utils.BlackBodySource(30000)
+bb_model = sncosmo.Model(source=source)
 qso_source = tde_utils.QSOSource(r_mag = -25.)
+qso_model = sncosmo.Model(source=qso_source)
+snia_model = sncosmo.Model(source='salt2-extended')
+gal_model = sncosmo.Model(source=gal)
 
 filter_loop = tqdm(list(tde_mags.keys()), total = len(list(tde_mags.keys()))*len(zs))
 
@@ -63,8 +68,6 @@ for filt in filter_loop:
         luminosity_distance = cosmo.luminosity_distance(z)
         
         # TDE Magnitudes
-        source = tde_utils.BlackBodySource(30000)
-        bb_model = sncosmo.Model(source=source)
         bb_model.set(z=z)
 
         filter_zstretched_mag = bb_model.bandmag(filt, 'ab', 0)
@@ -72,8 +75,6 @@ for filt in filter_loop:
         tde_mags[filt][i] = app_mag
 
         # Galaxy Magnitudes
-
-        gal_model = sncosmo.Model(source=gal)
         gal_model.set(z=z)
         try:
             gal_zstretched_mag = gal_model.bandmag(filt, 'ab', 0)
@@ -84,7 +85,6 @@ for filt in filter_loop:
         
         # SNe Ia Magnitudes
 
-        snia_model = sncosmo.Model(source='salt2-extended')
         snia_model.set(z=z)
         snia_model.set(x1=0, c=0, x0= 1051627384124.3574, t0=0)
         try:
@@ -105,7 +105,6 @@ for filt in filter_loop:
             
         # QSO Magnitudes
         
-        qso_model = sncosmo.Model(source=qso_source)
         qso_model.set(z=z)
         try:
             qso_zstretched_mag = qso_model.bandmag(filt, 'ab', 0)
