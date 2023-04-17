@@ -9,11 +9,11 @@ import sys
 import json
 import pandas as pd
 
-tde_utils_location = '../'
+tde_utils_location = '/home/mkarmen1/tde_forecasting/' 
 sys.path.append(tde_utils_location)
 from scripts import tde_utils
 
-with open('../survey_master_list.json', 'r') as fp:
+with open(tde_utils_location + 'survey_master_list.json', 'r') as fp:
     survey_limits = json.load(fp)
     
 roman_wide_limits = survey_limits['roman_wide_limits']
@@ -121,13 +121,13 @@ for mag_dict in [tde_mags, gal_mags, snia_mags, qso_mags]:
 	mag_dict['z'] = zs
 
 tde_df = pd.DataFrame(tde_mags)
-tde_df.to_csv('../data/tde_mag_z.csv')
+tde_df.to_csv(tde_utils_location + 'data/tde_mag_z.csv')
 
 gal_df = pd.DataFrame(gal_mags)
-gal_df.to_csv('../data/galaxy_mag_z.csv')
+gal_df.to_csv(tde_utils_location + 'data/galaxy_mag_z.csv')
 
 snia_df = pd.DataFrame(snia_mags)
-snia_df.to_csv('../data/snia_mag_z.csv')
+snia_df.to_csv(tde_utils_location + 'data/snia_mag_z.csv')
 
 qso_df = pd.DataFrame(qso_mags)
-qso_df.to_csv('../data/qso_mag_z.csv')
+qso_df.to_csv(tde_utils_location + 'data/qso_mag_z.csv')

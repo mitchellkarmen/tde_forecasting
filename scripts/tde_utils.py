@@ -7,7 +7,7 @@ import kcorrect.kcorrect
 c = const.c.cgs
 h = const.h.cgs
 k_B = const.k_B.cgs
-
+base_dir = '/home/mkarmen1/tde_forecasting/' 
 
 class GalaxySource(sncosmo.Source):
     _param_names = ['c1', 'c2', 'c3', 'c4', 'c5']
@@ -92,7 +92,7 @@ class QSOSource(sncosmo.Source):
         self.version = 0.1
         self._phase = 0
         
-        qso_spectrum = np.loadtxt('../data/median_composite_quasar_spectrum.txt', skiprows=23) 
+        qso_spectrum = np.loadtxt(base_dir + 'data/median_composite_quasar_spectrum.txt', skiprows=23) 
         wave, relative_flux, relative_flux_err = qso_spectrum.T
         
         default_r_mag = -21.332976980967537
