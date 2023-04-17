@@ -3,11 +3,15 @@ import sncosmo
 from astropy import constants as const
 from astropy import units as u
 import kcorrect.kcorrect
+import yaml
 
 c = const.c.cgs
 h = const.h.cgs
 k_B = const.k_B.cgs
-base_dir = '/home/mkarmen1/tde_forecasting/' 
+with open ('CONFIG.yml', 'r') as config_file:
+    config = yaml.safe_load(config_file)
+
+base_dir = config['base_dir']
 
 class GalaxySource(sncosmo.Source):
     _param_names = ['c1', 'c2', 'c3', 'c4', 'c5']
@@ -32,9 +36,12 @@ class GalaxySource(sncosmo.Source):
         rf_mags = kc.absmag(redshift=obs_z, maggies=maggies, ivar=ivar, coeffs=coeffs)
         maggies, ivar = kcorrect.utils.sdss_asinh_to_maggies(rf_mags, errs)
         coeffs = kc.fit_coeffs(redshift=0, maggies=maggies, ivar = ivar)
+
+        default_flux = coeffs.dot(templates.flux)
         
         
         templates = kc.templates
+        default_flux = coeffs.dot(templates.flux)
         #templates.set_redshift(obs_z)
         self._wave = templates.restframe_wave # * (1. + obs_z)
         self.obs_z = obs_z
@@ -42,11 +49,11 @@ class GalaxySource(sncosmo.Source):
         self.coeffs = coeffs
         self._parameters = coeffs
         self.templates = templates
+        self.default_flux = default_flux
         
     def _flux(self, phase, wave):
         default_wave = self._wave
-        default_flux = self.coeffs.dot(self.templates.flux) # / (1. + self.obs_z) 
-        rf_flux = default_flux 
+        rf_flux = self.default_flux 
         fill_errs = np.full(len(default_wave), 0.001)
         spectrum = sncosmo.Spectrum(default_wave, rf_flux, fill_errs)
         binned_spectrum = spectrum.rebin(wave)
