@@ -4,14 +4,43 @@ from astropy import constants as const
 from astropy import units as u
 import kcorrect.kcorrect
 import yaml
+import pysynphot as S
 
 c = const.c.cgs
 h = const.h.cgs
 k_B = const.k_B.cgs
-with open ('CONFIG.yml', 'r') as config_file:
+with open ('../scripts/CONFIG.yml', 'r') as config_file:
     config = yaml.safe_load(config_file)
 
 base_dir = config['base_dir']
+
+class StellarSource(sncosmo.Source):
+    _param_names = ['temperature', 'log_g', 'metallicity']
+    param_names_latex = ['Temperature (K)', 'log(g)', 'metallicity']
+
+    def __init__(self, t=10000, logg=5, metallicity=-1.5):
+
+        self.name = "Star"
+        self.version = 0.1
+        self.phase = 0
+
+        spec = S.Icat('ck04models', Teff = t, log_g= logg, 
+            metallicity = metallicity)
+
+        self._spec = np.ravel(spec.flux[:1212]) #end early to avoid binning issue
+        self._wave = np.ravel(spec.wave[:1212])
+        self._parameters = [t, logg, metallicity]
+
+    def _flux(self, phase, wave):
+        default_wave = self._wave
+        fill_errs = np.full(len(default_wave), 0.001)
+        default_flux = self._spec
+        spectrum = sncosmo.Spectrum(default_wave, default_flux, fill_errs)
+        binned_spectrum = spectrum.rebin(wave)
+        flux = binned_spectrum.flux
+        return flux.reshape(1, len(flux))
+
+
 
 class GalaxySource(sncosmo.Source):
     _param_names = ['c1', 'c2', 'c3', 'c4', 'c5']
@@ -81,6 +110,21 @@ class BlackBodySource(sncosmo.Source):
         spectrum = scale * spectrum.value
         
         return spectrum.reshape(1, len(spectrum))
+
+class CalzettiDust(PropagationEffect):
+    """Cardelli, Clayton, Mathis (1989) extinction model dust."""
+    _param_names = ['a_v', 'r_v']
+    param_names_latex = ['A_V', 'R_V']
+    _minwave = 1200.
+    _maxwave = 22000.
+
+    def __init__(self):
+        self._parameters = np.array([0., 4.2])
+
+    def propagate(self, wave, flux, phase=None):
+        """Propagate the flux."""
+        ebv, r_v = self._parameters
+        return extinction.apply(extinction.ccm89(wave, ebv * r_v, r_v), flux)
 
 class QSOSource(sncosmo.Source):
     _param_names = ['r_mag']
